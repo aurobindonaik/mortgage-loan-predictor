@@ -1,0 +1,11 @@
+server:
+  port: 8080
+
+model:
+  approval-path: ${MODEL_APPROVAL_PATH:./models/approval_model.zip}
+  borrow-path: ${MODEL_BORROW_PATH:./models/borrow_model.zip}
+  risk-path: ${MODEL_RISK_PATH:./models/risk_model.zip}
+
+logging:
+  level:
+    root: INFO

@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      MODEL_APPROVAL_PATH: /opt/models/approval_model.zip
+      MODEL_BORROW_PATH: /opt/models/borrow_model.zip
+      MODEL_RISK_PATH: /opt/models/risk_model.zip
+    volumes:
+      - ./models:/opt/models:ro
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
