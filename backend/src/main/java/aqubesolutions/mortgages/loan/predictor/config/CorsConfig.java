@@ -14,8 +14,10 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
                         .allowedOrigins("http://localhost:5173")
+                        .allowedOrigins("https://mortgageaiprofiler.aqubesolutions.uk")
                         .allowedMethods("GET", "POST", "OPTIONS")
-                        .allowedHeaders("*");
+                        .allowedHeaders("*")
+                        .allowCredentials(false);
             }
         };
     }

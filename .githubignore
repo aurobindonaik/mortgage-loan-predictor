@@ -1,5 +1,5 @@
 # Ignore Maven target directory
-target/
+**/target/
 
 # Ignore logs
 *.log
@@ -9,31 +9,31 @@ target/
 *.bak
 
 # Ignore IDE-specific files
-/.idea/
-/*.iml
+**/.idea/
+**/*.iml
 
 # Ignore OS-specific files
 .DS_Store
 Thumbs.db
 
 # Node.js dependencies
-node_modules/
+**/node_modules/
 
 # Logs
-logs/
+**/logs/
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
 
 # Environment variables
-.env
-.env.local
-.env.*.local
+**/.env
+**/.env.local
+**/.env.*.local
 
 # Build output
-dist/
-build/
+**/dist/
+**/build/
 
 # Temporary files
 *.tmp

@@ -534,7 +534,7 @@ export default function App() {
     setResult(null);
     try {
       const body = { ...form, mortgage_term_months };
-      const resp = await fetch("http://localhost:8080/api/score", {
+      const resp = await fetch("/api/score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
