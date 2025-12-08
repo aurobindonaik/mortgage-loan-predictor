@@ -543,6 +543,9 @@ export default function App() {
       if (!resp.ok) {
         throw new Error(json.error || "Request failed");
       }
+      if (resp.policy_message) {
+         showBanner(resp.policy_message);
+      }
       setResult(json);
     } catch (err) {
       console.error(err);

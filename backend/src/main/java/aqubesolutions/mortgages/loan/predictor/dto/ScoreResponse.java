@@ -6,6 +6,7 @@ public class ScoreResponse {
     public ApprovalPart approval;
     public LoanPart loanAmount;
     public RiskPart risk;
+    public String policy_message;
 
     public static class ApprovalPart {
         public String label;

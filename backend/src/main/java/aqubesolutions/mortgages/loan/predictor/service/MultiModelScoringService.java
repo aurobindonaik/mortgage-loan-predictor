@@ -11,6 +11,7 @@ import hex.genmodel.easy.prediction.RegressionModelPrediction;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,9 @@ public class MultiModelScoringService {
 
     @Value("${model.risk-path}")
     private String riskPath;
+
+    @Autowired
+    private PolicyRuleEngine rules;
 
     private EasyPredictModelWrapper approvalModel;
     private EasyPredictModelWrapper borrowModel;
@@ -60,6 +64,34 @@ public class MultiModelScoringService {
             throw new IllegalStateException("Models not loaded");
         }
 
+        // Run policy rules BEFORE ML
+        PolicyRuleEngine.PolicyResult ruleResult = rules.applyRules(req);
+
+        if (!ruleResult.approved) {
+            // Hard decline — skip ML
+            ScoreResponse res = new ScoreResponse();
+            ScoreResponse.ApprovalPart ap = new ScoreResponse.ApprovalPart();
+            ap.label = "Declined";
+            ap.prob_approved = 0.0;
+            ap.prob_declined = 1.0;
+            res.approval = ap;
+
+            ScoreResponse.LoanPart lp = new ScoreResponse.LoanPart();
+            lp.predicted_amount = 0.0;
+            res.loanAmount = lp;
+
+            ScoreResponse.RiskPart rp = new ScoreResponse.RiskPart();
+            rp.label = "HIGH";
+            res.risk = rp;
+
+            return res;
+        }
+
+        // Adjust income if required
+        if (ruleResult.incomeAdjusted) {
+            req.annual_income = ruleResult.adjustedIncome;
+        }
+
         RowData row = new RowData();
         put(row, "age", req.age);
         put(row, "annual_income", req.annual_income);
@@ -74,7 +106,10 @@ public class MultiModelScoringService {
         RegressionModelPrediction borrowPred = borrowModel.predictRegression(row);
         MultinomialModelPrediction riskPred = riskModel.predictMultinomial(row);
 
-        ScoreResponse res = new ScoreResponse();
+        var res = new ScoreResponse();
+        res.policy_message = ruleResult.incomeAdjusted
+                ? "Income adjusted for retirement"
+                : "Eligible under policy rules";
 
         ScoreResponse.ApprovalPart approvalPart = new ScoreResponse.ApprovalPart();
         approvalPart.label = approvalPred.label;
