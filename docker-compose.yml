@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   backend:
     build:
@@ -7,9 +6,13 @@ services:
     ports:
       - "8080:8080"
     environment:
-      MODEL_APPROVAL_PATH: /opt/models/approval_model.zip
-      MODEL_BORROW_PATH: /opt/models/borrow_model.zip
-      MODEL_RISK_PATH: /opt/models/risk_model.zip
+      MODEL_APPROVAL_PATH: /opt/models/mo_approval_model.zip
+      MODEL_BORROW_PATH: /opt/models/mo_borrow_model.zip
+      MODEL_CREDIT_APPROVAL_PATH: /opt/models/credit_approval_model.zip
+      MODEL_CREDIT_BORROW_PATH: /opt/models/credit_borrow_model.zip
+      MODEL_LOAN_APPROVAL_PATH: /opt/models/loan_approval_model.zip
+      MODEL_LOAN_BORROW_PATH: /opt/models/loan_borrow_model.zip
+      MODEL_CURRENT_APPROVAL_PATH: /opt/models/current_approval_model.zip
     volumes:
       - ./models:/opt/models:ro
 

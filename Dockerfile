@@ -47,12 +47,11 @@ WORKDIR /app
 COPY --from=backend-build /app/backend/target/*.jar app.jar
 
 ##############################
-# COPY ML MODELS (3 Mojos)
+# COPY ML MODELS (2 Mojos)
 ##############################
 # Expected filenames:
 #  - approval_model.zip
 #  - borrow_model.zip
-#  - risk_model.zip
 COPY models /app/models
 
 ##############################
@@ -69,7 +68,6 @@ COPY --from=ui-build /app/frontend/dist /app/static
 ##############################
 ENV MODEL_APPROVAL_PATH=/app/models/approval_model.zip \
     MODEL_BORROW_PATH=/app/models/borrow_model.zip \
-    MODEL_RISK_PATH=/app/models/risk_model.zip \
     SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:/app/static/
 
 ##############################

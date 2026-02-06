@@ -2,9 +2,13 @@ server:
   port: 8080
 
 model:
-  approval-path: ${MODEL_APPROVAL_PATH:./models/approval_model.zip}
-  borrow-path: ${MODEL_BORROW_PATH:./models/borrow_model.zip}
-  risk-path: ${MODEL_RISK_PATH:./models/risk_model.zip}
+  approval-path: ${MODEL_APPROVAL_PATH:./models/mo_approval_model.zip}
+  borrow-path: ${MODEL_BORROW_PATH:./models/mo_borrow_model.zip}
+  credit-approval-path: ${MODEL_CREDIT_APPROVAL_PATH:./models/credit_approval_model.zip}
+  credit-borrow-path: ${MODEL_CREDIT_BORROW_PATH:./models/credit_borrow_model.zip}
+  loan-approval-path: ${MODEL_LOAN_APPROVAL_PATH:./models/loan_approval_model.zip}
+  loan-borrow-path: ${MODEL_LOAN_BORROW_PATH:./models/loan_borrow_model.zip}
+  current-approval-path: ${MODEL_CURRENT_APPROVAL_PATH:./models/current_approval_model.zip}
 
 logging:
   level:

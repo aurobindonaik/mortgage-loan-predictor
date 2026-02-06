@@ -6,7 +6,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>uk.co.aqubesolutions</groupId>
-  <artifactId>mortgage-loan-predictor-backend</artifactId>
+  <artifactId>aicreditlens</artifactId>
   <version>1.0.0</version>
   <packaging>jar</packaging>
 

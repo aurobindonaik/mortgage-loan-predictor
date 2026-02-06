@@ -4,7 +4,6 @@ import aqubesolutions.mortgages.loan.predictor.dto.ScoreRequest;
 import hex.genmodel.easy.EasyPredictModelWrapper;
 import hex.genmodel.easy.RowData;
 import hex.genmodel.easy.prediction.BinomialModelPrediction;
-import hex.genmodel.easy.prediction.MultinomialModelPrediction;
 import hex.genmodel.easy.prediction.RegressionModelPrediction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,17 +28,12 @@ class MultiModelScoringServiceTest {
     @Mock
     private EasyPredictModelWrapper borrowModel;
 
-    @Mock
-    private EasyPredictModelWrapper riskModel;
-
     @BeforeEach
     void setUp() throws Exception {
         service = new MultiModelScoringService();
 
         setPrivateField(service, "approvalModel", approvalModel);
         setPrivateField(service, "borrowModel", borrowModel);
-        setPrivateField(service, "riskModel", riskModel);
-        setPrivateField(service, "riskDomain", new String[]{"Low", "Medium", "High"});
     }
 
     private void setPrivateField(Object target, String fieldName, Object value) throws Exception {
@@ -63,13 +57,8 @@ class MultiModelScoringServiceTest {
         RegressionModelPrediction borrowPrediction = new RegressionModelPrediction();
         borrowPrediction.value = 250000.0;
 
-        MultinomialModelPrediction riskPrediction = new MultinomialModelPrediction();
-        riskPrediction.label = "Medium";
-        riskPrediction.classProbabilities = new double[]{0.2, 0.5, 0.3};
-
         when(approvalModel.predictBinomial(any(RowData.class))).thenReturn(approvalPrediction);
         when(borrowModel.predictRegression(any(RowData.class))).thenReturn(borrowPrediction);
-        when(riskModel.predictMultinomial(any(RowData.class))).thenReturn(riskPrediction);
 
         // Create request
         ScoreRequest request = new ScoreRequest();
@@ -90,15 +79,12 @@ class MultiModelScoringServiceTest {
         assertEquals("Approved", response.approval.label);
         assertEquals(0.7, response.approval.prob_approved);
         assertEquals(250000.0, response.loanAmount.predicted_amount);
-        assertEquals("Medium", response.risk.label);
-        assertEquals(0.5, response.risk.classProbabilities.get("Medium"));
     }
 
     @Test
     void testScoreWhenModelsNotLoaded() throws Exception {
         setPrivateField(service, "approvalModel", null);
         setPrivateField(service, "borrowModel", null);
-        setPrivateField(service, "riskModel", null);
 
         var request = new ScoreRequest();
 

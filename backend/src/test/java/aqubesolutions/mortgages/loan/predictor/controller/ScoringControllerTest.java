@@ -2,6 +2,9 @@ package aqubesolutions.mortgages.loan.predictor.controller;
 
 import aqubesolutions.mortgages.loan.predictor.dto.ScoreRequest;
 import aqubesolutions.mortgages.loan.predictor.dto.ScoreResponse;
+import aqubesolutions.mortgages.loan.predictor.service.CreditCardScoringService;
+import aqubesolutions.mortgages.loan.predictor.service.CurrentAccountScoringService;
+import aqubesolutions.mortgages.loan.predictor.service.LoanScoringService;
 import aqubesolutions.mortgages.loan.predictor.service.MultiModelScoringService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -26,6 +29,15 @@ class ScoringControllerTest {
 
     @MockitoBean
     private MultiModelScoringService service;
+
+    @MockitoBean
+    private CreditCardScoringService creditCardService;
+
+    @MockitoBean
+    private LoanScoringService loanService;
+
+    @MockitoBean
+    private CurrentAccountScoringService currentAccountService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -56,7 +68,7 @@ class ScoringControllerTest {
 
         Mockito.when(service.score(any(ScoreRequest.class))).thenReturn(response);
 
-        mockMvc.perform(post("/api/score")
+        mockMvc.perform(post("/api/score/mo")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
@@ -68,7 +80,7 @@ class ScoringControllerTest {
 
         Mockito.when(service.score(any(ScoreRequest.class))).thenThrow(new IllegalStateException("Models not loaded"));
 
-        mockMvc.perform(post("/api/score")
+        mockMvc.perform(post("/api/score/mo")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isServiceUnavailable())
@@ -81,7 +93,7 @@ class ScoringControllerTest {
 
         Mockito.when(service.score(any(ScoreRequest.class))).thenThrow(new RuntimeException("Unexpected error"));
 
-        mockMvc.perform(post("/api/score")
+        mockMvc.perform(post("/api/score/mo")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isInternalServerError())

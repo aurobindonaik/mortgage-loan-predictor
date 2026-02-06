@@ -1,11 +1,8 @@
 package aqubesolutions.mortgages.loan.predictor.dto;
 
-import java.util.Map;
-
 public class ScoreResponse {
     public ApprovalPart approval;
     public LoanPart loanAmount;
-    public RiskPart risk;
     public String policy_message;
 
     public static class ApprovalPart {
@@ -16,10 +13,5 @@ public class ScoreResponse {
 
     public static class LoanPart {
         public double predicted_amount;
-    }
-
-    public static class RiskPart {
-        public String label;
-        public Map<String, Double> classProbabilities;
     }
 }
