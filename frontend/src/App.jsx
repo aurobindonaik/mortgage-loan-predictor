@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 
 const initialForms = {
   mo: {
@@ -279,17 +279,17 @@ function buildDecision(form, result) {
   const probApproved = approval.prob_approved ?? 0;
   const probDeclined = approval.prob_declined ?? 0;
 
-  // "Model says approve?" (fallback to label if probs not present)
+  // "Scoring says approve?" (fallback to label if probs not present)
   let isApprovedModel = probApproved > probDeclined;
   if (probApproved === 0 && probDeclined === 0 && approval.label != null) {
     isApprovedModel = String(approval.label) === "0";
   }
 
-  // Simple model confidence band for display
+  // Simple confidence band for display
   const mlBand =
     probApproved >= 0.8 ? "Strong" : probApproved >= 0.6 ? "Moderate" : "Weak";
 
-  // Affordability ratio: requested loan vs model capacity
+  // Affordability ratio: requested loan vs estimated capacity
   const affordableRatio =
     capacity > 0 ? requested / capacity : Number.POSITIVE_INFINITY;
 
@@ -321,13 +321,13 @@ function buildDecision(form, result) {
   if (!isApprovedModel) {
     finalDecision = "DECLINED";
     level = "red";
-    reasons.push("Low model approval confidence");
+    reasons.push("Low approval confidence");
   }
 
   if (affordabilityTier === "Fail") {
     finalDecision = "DECLINED";
     level = "red";
-    reasons.push("Requested loan exceeds model capacity");
+    reasons.push("Requested loan exceeds estimated capacity");
   }
 
   if (finalDecision === "DECLINED") {
@@ -440,9 +440,9 @@ function DecisionTile({ decision }) {
         <div className="absolute -top-16 -right-10 h-32 w-32 rounded-full bg-emerald-300/20 blur-2xl" />
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] text-slate-500 uppercase tracking-[0.16em]">
-              Final decision (engine v2)
-            </p>
+          <p className="text-[10px] text-slate-500 uppercase tracking-[0.16em]">
+            Final decision
+          </p>
             <p className="text-xs text-slate-500 mt-0.5">
               Combines approval &amp; capacity.
             </p>
@@ -639,7 +639,7 @@ function ApprovalGauge({ decision }) {
         </div>
       </div>
       <p className="text-[11px] text-slate-500 text-center">
-        Model approval confidence based on scoring output.
+        Approval confidence based on scoring output.
       </p>
       </div>
     </div>
@@ -655,6 +655,31 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const showRawResponse = import.meta.env.VITE_SHOW_RAW_RESPONSE === "true";
+  const apiBase =
+    import.meta.env.VITE_API_BASE_URL?.trim() || window.location.origin;
+  const formSectionRef = useRef(null);
+  const resultsSectionRef = useRef(null);
+
+  const isMobileView = () =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(max-width: 1023px)").matches;
+
+  const scrollToRef = (ref) => {
+    if (!ref?.current || !isMobileView()) return;
+    ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  useEffect(() => {
+    if (!result?.approval) return;
+    const handleResize = () => {
+      if (isMobileView()) {
+        scrollToRef(resultsSectionRef);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, [result]);
 
   const isMortgage = product === "mo";
   const isCreditCard = product === "cc";
@@ -691,6 +716,7 @@ export default function App() {
     setForm(initialForms[nextProduct]);
     setResult(null);
     setError(null);
+    setTimeout(() => scrollToRef(formSectionRef), 100);
   };
 
   const handleSubmit = async (e) => {
@@ -700,10 +726,10 @@ export default function App() {
     setResult(null);
     try {
       const endpointMap = {
-        mo: "http://localhost:8080/api/score/mo",
-        cc: "http://localhost:8080/api/score/cc",
-        ln: "http://localhost:8080/api/score/ln",
-        ca: "http://localhost:8080/api/score/ca",
+        mo: `${apiBase}/api/score/mo`,
+        cc: `${apiBase}/api/score/cc`,
+        ln: `${apiBase}/api/score/ln`,
+        ca: `${apiBase}/api/score/ca`,
       };
       const body = isMortgage ? { ...form, mortgage_term_months } : { ...form };
       const resp = await fetch(endpointMap[product], {
@@ -719,6 +745,9 @@ export default function App() {
          showBanner(resp.policy_message);
       }
       setResult(json);
+      if (json?.approval) {
+        setTimeout(() => scrollToRef(resultsSectionRef), 100);
+      }
     } catch (err) {
       console.error(err);
       setError(err.message || "Something went wrong");
@@ -744,8 +773,8 @@ export default function App() {
     : 0;
   const capacityLabel = isCreditCard ? "Credit limit capacity" : "Borrowing capacity";
   const capacityHint = isCreditCard
-    ? "Model-estimated maximum card limit for this profile."
-    : "Model-estimated maximum loan for this profile.";
+    ? "Estimated maximum card limit for this profile."
+    : "Estimated maximum loan for this profile.";
   const requestedLabel = isCreditCard ? "Requested vs limit" : "Requested vs capacity";
 
   return (
@@ -765,17 +794,17 @@ export default function App() {
               </div>
             </div>
           </div>
-          <div className="hidden sm:flex items-center gap-2 text-xs">
-            {product && (
+          {product && (
+            <div className="flex items-center gap-2 text-xs">
               <button
                 type="button"
                 onClick={() => handleSelectProduct(null)}
-                className="px-2 py-1 rounded-full bg-red-800/70 border border-red-500/60 hover:bg-red-700/70 transition"
+                className="px-2.5 py-1 rounded-full bg-red-800/70 border border-red-500/60 hover:bg-red-700/70 transition"
               >
                 Change product
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </header>
 
@@ -785,11 +814,11 @@ export default function App() {
             <div className="bg-white/80 backdrop-blur rounded-3xl shadow-card border border-slate-200/80 p-8">
               <div className="flex flex-col gap-2 mb-6">
                 <h2 className="text-lg font-semibold text-slate-900">
-                  Start an instant eligibility snapshot
+                  Get a quick eligibility overview
                 </h2>
                 <p className="text-sm text-slate-500">
-                  Choose a product to generate a fast, policy-aware preview
-                  using numeric inputs only.
+                  Choose a product to generate a fast, policy-aware preview —
+                  no personal data is collected or stored.
                 </p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -829,87 +858,11 @@ export default function App() {
           </div>
         ) : (
           <div className="max-w-6xl mx-auto px-4 py-6 grid gap-6 lg:grid-cols-[1.6fr,1.4fr]">
-          {/* Left: form + KPI cards */}
-          <section className="space-y-4">
-            <div className="bg-white/80 backdrop-blur rounded-2xl shadow-card border border-slate-200/80">
-              <div className="px-5 pt-5 pb-3 border-b border-slate-100 flex items-center justify-between">
-                <div>
-                  <h2 className="text-sm font-semibold text-slate-900">
-                    Applicant inputs
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Numeric-only inputs to support a GDPR-friendly assessment.
-                  </p>
-                </div>
-                {loading && (
-                  <span className="text-xs text-white bg-brand-red px-2 py-1 rounded-full">
-                    Running models…
-                  </span>
-                )}
-              </div>
-              <form
-                onSubmit={handleSubmit}
-                className="px-5 pb-5 pt-3 grid gap-3 sm:grid-cols-2"
-              >
-                {productFieldConfig[product].map((field) => (
-                  <div key={field.key}>
-                    <Label>{field.label}</Label>
-                    <NumberInput
-                      value={form[field.key]}
-                      onChange={(v) => handleChange(field.key, v)}
-                    />
-                  </div>
-                ))}
-                {isMortgage && (
-                  <div>
-                    <Label>Mortgage term (months)</Label>
-                    <input
-                      value={mortgage_term_months}
-                      readOnly
-                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm bg-slate-100 text-slate-500"
-                    />
-                  </div>
-                )}
-                <div className="sm:col-span-2 mt-1">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full inline-flex items-center justify-center rounded-xl bg-brand-red hover:bg-red-600 disabled:bg-red-300 text-sm font-semibold text-white py-2.5 shadow-md shadow-red-500/20 transition"
-                  >
-                    {loading ? "Running assessment…" : "Run assessment"}
-                  </button>
-                </div>
-              </form>
-              {error && (
-                <div className="px-5 pb-4 text-xs text-red-700 bg-red-50 border-t border-red-100">
-                  {error}
-                </div>
-              )}
-            </div>
-
-            {isMortgage && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <StatCard
-                  label="Indicative LTV"
-                  value={form.property_price ? `${ltv.toFixed(1)}%` : "—"}
-                  hint="Requested loan vs property value"
-                />
-                <StatCard
-                  label="Debt / income"
-                  value={`${(dti * 100).toFixed(1)}%`}
-                  hint="Annualised debt as % of income"
-                />
-                <StatCard
-                  label="Term"
-                  value={`${form.mortgage_term_years} years`}
-                  hint={`${mortgage_term_months} months`}
-                />
-              </div>
-            )}
-          </section>
-
-          {/* Right: decision, capacity, chart, JSON */}
-          <section className="space-y-4">
+          {/* Results: decision, capacity, chart, JSON */}
+          <section
+            ref={resultsSectionRef}
+            className="space-y-4 overflow-hidden lg:overflow-visible lg:col-start-2 lg:row-start-1"
+          >
             {isMortgage ? (
               <>
                 <div className="bg-white/80 backdrop-blur rounded-2xl shadow-card border border-slate-200/80 p-5 space-y-4">
@@ -931,7 +884,7 @@ export default function App() {
                           })}
                         </p>
                         <p className="text-[11px] text-slate-500">
-                          Model-estimated maximum loan for this profile.
+                          Estimated maximum loan for this profile.
                         </p>
                         <Progress
                           label="Requested vs capacity"
@@ -1010,6 +963,88 @@ export default function App() {
                 <pre className="max-h-64 overflow-auto text-[11px] text-emerald-300">
 {result ? JSON.stringify(result, null, 2) : "// Run an assessment to see the JSON payload here."}
                 </pre>
+              </div>
+            )}
+          </section>
+
+          {/* Inputs: form + KPI cards */}
+          <section
+            ref={formSectionRef}
+            className="space-y-4 lg:col-start-1 lg:row-start-1"
+          >
+            <div className="bg-white/80 backdrop-blur rounded-2xl shadow-card border border-slate-200/80">
+              <div className="px-5 pt-5 pb-3 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                  <h2 className="text-sm font-semibold text-slate-900">
+                    Customer details
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-1">
+                    No personal data is collected or stored.
+                  </p>
+                </div>
+                {loading && (
+                  <span className="text-xs text-white bg-brand-red px-2 py-1 rounded-full">
+                    Running assessment…
+                  </span>
+                )}
+              </div>
+              <form
+                onSubmit={handleSubmit}
+                className="px-5 pb-5 pt-3 grid gap-3 sm:grid-cols-2"
+              >
+                {productFieldConfig[product].map((field) => (
+                  <div key={field.key}>
+                    <Label>{field.label}</Label>
+                    <NumberInput
+                      value={form[field.key]}
+                      onChange={(v) => handleChange(field.key, v)}
+                    />
+                  </div>
+                ))}
+                {isMortgage && (
+                  <div>
+                    <Label>Mortgage term (months)</Label>
+                    <input
+                      value={mortgage_term_months}
+                      readOnly
+                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm bg-slate-100 text-slate-500"
+                    />
+                  </div>
+                )}
+                <div className="sm:col-span-2 mt-1">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full inline-flex items-center justify-center rounded-xl bg-brand-red hover:bg-red-600 disabled:bg-red-300 text-sm font-semibold text-white py-2.5 shadow-md shadow-red-500/20 transition"
+                  >
+                    {loading ? "Running assessment…" : "Run assessment"}
+                  </button>
+                </div>
+              </form>
+              {error && (
+                <div className="px-5 pb-4 text-xs text-red-700 bg-red-50 border-t border-red-100">
+                  {error}
+                </div>
+              )}
+            </div>
+
+            {isMortgage && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <StatCard
+                  label="Indicative LTV"
+                  value={form.property_price ? `${ltv.toFixed(1)}%` : "—"}
+                  hint="Requested loan vs property value"
+                />
+                <StatCard
+                  label="Debt / income"
+                  value={`${(dti * 100).toFixed(1)}%`}
+                  hint="Annualised debt as % of income"
+                />
+                <StatCard
+                  label="Term"
+                  value={`${form.mortgage_term_years} years`}
+                  hint={`${mortgage_term_months} months`}
+                />
               </div>
             )}
           </section>

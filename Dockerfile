@@ -50,8 +50,13 @@ COPY --from=backend-build /app/backend/target/*.jar app.jar
 # COPY ML MODELS (2 Mojos)
 ##############################
 # Expected filenames:
-#  - approval_model.zip
-#  - borrow_model.zip
+#  - mo_approval_model.zip
+#  - mo_borrow_model.zip
+#  - credit_approval_model.zip
+#  - credit_borrow_model.zip
+#  - loan_approval_model.zip
+#  - loan_borrow_model.zip
+#  - current_approval_model.zip
 COPY models /app/models
 
 ##############################
@@ -66,8 +71,13 @@ COPY --from=ui-build /app/frontend/dist /app/static
 ##############################
 # ENV VARS FOR BACKEND CONFIG
 ##############################
-ENV MODEL_APPROVAL_PATH=/app/models/approval_model.zip \
-    MODEL_BORROW_PATH=/app/models/borrow_model.zip \
+ENV MODEL_APPROVAL_PATH=/app/models/mo_approval_model.zip \
+    MODEL_BORROW_PATH=/app/models/mo_borrow_model.zip \
+    MODEL_CREDIT_APPROVAL_PATH=/app/models/credit_approval_model.zip \
+    MODEL_CREDIT_BORROW_PATH=/app/models/credit_borrow_model.zip \
+    MODEL_LOAN_APPROVAL_PATH=/app/models/loan_approval_model.zip \
+    MODEL_LOAN_BORROW_PATH=/app/models/loan_borrow_model.zip \
+    MODEL_CURRENT_APPROVAL_PATH=/app/models/current_approval_model.zip \
     SPRING_WEB_RESOURCES_STATIC_LOCATIONS=file:/app/static/
 
 ##############################
