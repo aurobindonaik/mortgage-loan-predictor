@@ -655,8 +655,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const showRawResponse = import.meta.env.VITE_SHOW_RAW_RESPONSE === "true";
-  const apiBase =
-    import.meta.env.VITE_API_BASE_URL?.trim() || window.location.origin;
+  const apiBase = import.meta.env.VITE_API_BASE_URL?.trim() || "";
   const formSectionRef = useRef(null);
   const resultsSectionRef = useRef(null);
 
