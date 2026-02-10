@@ -1,0 +1,15 @@
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  -t aurobindonaik/aicreditlens-amd64-arm64:latest \
+  --push .
+
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  --no-cache --pull \
+  -t aurobindonaik/aicreditlens-amd64-arm64:latest \
+  --push .
+
+docker pull aurobindonaik/aicreditlens-amd64-arm64:latest
+docker run --rm -p 8081:8080 aurobindonaik/aicreditlens-amd64-arm64:latest
+or
+docker run --rm -p 8080:8080 aurobindonaik/aicreditlens-amd64-arm64:latest

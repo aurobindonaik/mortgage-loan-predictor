@@ -15,7 +15,7 @@ public class CorsConfig {
                 registry.addMapping("/api/**")
                         .allowedOriginPatterns(
                                 "http://localhost:5173",
-                                "https://mortgageaiprofiler.aqubesolutions.uk"
+                                "https://*.aqubesolutions.uk"
                         )
                         .allowedMethods("GET", "POST", "OPTIONS")
                         .allowedHeaders("*")
