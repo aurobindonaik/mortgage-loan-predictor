@@ -1,4 +1,4 @@
-package aqubesolutions.mortgages.loan.predictor.dto;
+package aqubesolutions.aicredit.predictor.dto;
 
 public class ApprovalOnlyResponse {
     public ScoreResponse.ApprovalPart approval;

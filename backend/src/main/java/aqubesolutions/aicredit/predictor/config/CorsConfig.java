@@ -1,4 +1,4 @@
-package aqubesolutions.mortgages.loan.predictor.config;
+package aqubesolutions.aicredit.predictor.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

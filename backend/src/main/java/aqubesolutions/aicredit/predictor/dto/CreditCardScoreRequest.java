@@ -1,4 +1,4 @@
-package aqubesolutions.mortgages.loan.predictor.dto;
+package aqubesolutions.aicredit.predictor.dto;
 
 public class CreditCardScoreRequest {
     public Integer age;

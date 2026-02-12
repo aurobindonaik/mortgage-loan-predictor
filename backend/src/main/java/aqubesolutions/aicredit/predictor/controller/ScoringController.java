@@ -1,16 +1,16 @@
-package aqubesolutions.mortgages.loan.predictor.controller;
+package aqubesolutions.aicredit.predictor.controller;
 
-import aqubesolutions.mortgages.loan.predictor.dto.ApprovalOnlyResponse;
-import aqubesolutions.mortgages.loan.predictor.dto.CreditCardScoreRequest;
-import aqubesolutions.mortgages.loan.predictor.dto.CurrentAccountScoreRequest;
-import aqubesolutions.mortgages.loan.predictor.dto.LoanScoreRequest;
-import aqubesolutions.mortgages.loan.predictor.dto.ScoreRequest;
-import aqubesolutions.mortgages.loan.predictor.dto.ScoreResponse;
-import aqubesolutions.mortgages.loan.predictor.dto.SimpleScoreResponse;
-import aqubesolutions.mortgages.loan.predictor.service.CreditCardScoringService;
-import aqubesolutions.mortgages.loan.predictor.service.CurrentAccountScoringService;
-import aqubesolutions.mortgages.loan.predictor.service.LoanScoringService;
-import aqubesolutions.mortgages.loan.predictor.service.MultiModelScoringService;
+import aqubesolutions.aicredit.predictor.dto.ApprovalOnlyResponse;
+import aqubesolutions.aicredit.predictor.dto.CreditCardScoreRequest;
+import aqubesolutions.aicredit.predictor.dto.CurrentAccountScoreRequest;
+import aqubesolutions.aicredit.predictor.dto.LoanScoreRequest;
+import aqubesolutions.aicredit.predictor.dto.ScoreRequest;
+import aqubesolutions.aicredit.predictor.dto.ScoreResponse;
+import aqubesolutions.aicredit.predictor.dto.SimpleScoreResponse;
+import aqubesolutions.aicredit.predictor.service.CreditCardScoringService;
+import aqubesolutions.aicredit.predictor.service.CurrentAccountScoringService;
+import aqubesolutions.aicredit.predictor.service.LoanScoringService;
+import aqubesolutions.aicredit.predictor.service.MultiModelScoringService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

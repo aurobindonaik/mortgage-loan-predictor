@@ -1,8 +1,8 @@
-package aqubesolutions.mortgages.loan.predictor.service;
+package aqubesolutions.aicredit.predictor.service;
 
-import aqubesolutions.mortgages.loan.predictor.dto.ApprovalOnlyResponse;
-import aqubesolutions.mortgages.loan.predictor.dto.CurrentAccountScoreRequest;
-import aqubesolutions.mortgages.loan.predictor.dto.ScoreResponse;
+import aqubesolutions.aicredit.predictor.dto.ApprovalOnlyResponse;
+import aqubesolutions.aicredit.predictor.dto.CurrentAccountScoreRequest;
+import aqubesolutions.aicredit.predictor.dto.ScoreResponse;
 import hex.genmodel.MojoModel;
 import hex.genmodel.easy.EasyPredictModelWrapper;
 import hex.genmodel.easy.RowData;

@@ -1,11 +1,11 @@
-package aqubesolutions.mortgages.loan.predictor.controller;
+package aqubesolutions.aicredit.predictor.controller;
 
-import aqubesolutions.mortgages.loan.predictor.dto.ScoreRequest;
-import aqubesolutions.mortgages.loan.predictor.dto.ScoreResponse;
-import aqubesolutions.mortgages.loan.predictor.service.CreditCardScoringService;
-import aqubesolutions.mortgages.loan.predictor.service.CurrentAccountScoringService;
-import aqubesolutions.mortgages.loan.predictor.service.LoanScoringService;
-import aqubesolutions.mortgages.loan.predictor.service.MultiModelScoringService;
+import aqubesolutions.aicredit.predictor.dto.ScoreRequest;
+import aqubesolutions.aicredit.predictor.dto.ScoreResponse;
+import aqubesolutions.aicredit.predictor.service.CreditCardScoringService;
+import aqubesolutions.aicredit.predictor.service.CurrentAccountScoringService;
+import aqubesolutions.aicredit.predictor.service.LoanScoringService;
+import aqubesolutions.aicredit.predictor.service.MultiModelScoringService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

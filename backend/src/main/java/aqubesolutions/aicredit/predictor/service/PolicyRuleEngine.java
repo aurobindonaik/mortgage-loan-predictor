@@ -1,7 +1,6 @@
-package aqubesolutions.mortgages.loan.predictor.service;
+package aqubesolutions.aicredit.predictor.service;
 
-import aqubesolutions.mortgages.loan.predictor.dto.ScoreRequest;
-import aqubesolutions.mortgages.loan.predictor.dto.ScoreResponse;
+import aqubesolutions.aicredit.predictor.dto.ScoreRequest;
 import org.springframework.stereotype.Component;
 
 @Component

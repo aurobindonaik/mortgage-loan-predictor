@@ -1,4 +1,4 @@
-package aqubesolutions.mortgages.loan.predictor.config;
+package aqubesolutions.aicredit.predictor.config;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
