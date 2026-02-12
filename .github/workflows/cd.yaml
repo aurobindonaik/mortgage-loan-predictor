@@ -1,0 +1,79 @@
+name: CD Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: "Release version (e.g., 1.2.3)"
+        required: true
+      next_snapshot_version:
+        description: "Next development version (e.g., 1.2.4-SNAPSHOT)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Set release version
+        run: mvn -q -f backend/pom.xml -DnewVersion=${{ inputs.release_version }} -DgenerateBackupPoms=false versions:set
+
+      - name: Commit release version
+        run: |
+          git add backend/pom.xml
+          git commit -m "Release ${{ inputs.release_version }}"
+          git tag v${{ inputs.release_version }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            aurobindonaik/aicreditlens-amd64-arm64:${{ inputs.release_version }}
+            aurobindonaik/aicreditlens-amd64-arm64:latest
+
+      - name: Bump to next snapshot
+        run: mvn -q -f backend/pom.xml -DnewVersion=${{ inputs.next_snapshot_version }} -DgenerateBackupPoms=false versions:set
+
+      - name: Commit next snapshot
+        run: |
+          git add backend/pom.xml
+          git commit -m "Start ${{ inputs.next_snapshot_version }}"
+
+      - name: Push commits and tags
+        run: git push --follow-tags
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.release_version }}
+          generate_release_notes: true
