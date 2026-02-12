@@ -33,5 +33,6 @@ jobs:
 
       - name: Build frontend
         run: |
-          npm ci --prefix frontend
+          rm -f frontend/package-lock.json
+          npm install --legacy-peer-deps --prefix frontend
           npm run build --prefix frontend

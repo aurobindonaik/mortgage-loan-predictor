@@ -9,6 +9,14 @@ on:
       next_snapshot_version:
         description: "Next development version (e.g., 1.2.4-SNAPSHOT)"
         required: true
+      vite_api_base_url:
+        description: "Optional Vite API base URL to bake into the frontend (e.g., https://api.example.com)"
+        required: false
+        default: ""
+      docker_repo:
+        description: "Docker repository (e.g., aurobindonaik/aicreditlens-amd64-arm64)"
+        required: false
+        default: "aurobindonaik/aicreditlens-amd64-arm64"
 
 permissions:
   contents: write
@@ -57,9 +65,11 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
+          build-args: |
+            VITE_API_BASE_URL=${{ inputs.vite_api_base_url }}
           tags: |
-            aurobindonaik/aicreditlens-amd64-arm64:${{ inputs.release_version }}
-            aurobindonaik/aicreditlens-amd64-arm64:latest
+            ${{ inputs.docker_repo }}:${{ inputs.release_version }}
+            ${{ inputs.docker_repo }}:latest
 
       - name: Bump to next snapshot
         run: mvn -q -f backend/pom.xml -DnewVersion=${{ inputs.next_snapshot_version }} -DgenerateBackupPoms=false versions:set

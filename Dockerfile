@@ -4,6 +4,8 @@
 FROM node:20-bullseye AS ui-build
 
 ENV ROLLUP_USE_WASM=true
+ARG VITE_API_BASE_URL=""
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
