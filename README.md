@@ -59,3 +59,9 @@ docker run --rm -p 8080:8080 ai-credit-lens:prod
 
 Open:
 - App + API: `http://localhost:8080`
+
+## Deployment (Synology NAS)
+
+Current production path:
+
+![Deployment](Deployment.png)
