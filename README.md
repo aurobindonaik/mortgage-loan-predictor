@@ -2,7 +2,7 @@
 
 This project contains:
 
-- `backend/` — Spring Boot service that loads **two H2O MOJO models**:
+- `backend/` — Spring Boot service that loads **H2O MOJO models**:
     - approval (approved / not approved)
     - max borrow amount (regression)
 - `frontend/` — React single‑page app (built with Vite) to submit inputs and display results.
